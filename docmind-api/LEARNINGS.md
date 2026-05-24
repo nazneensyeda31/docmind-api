@@ -27,3 +27,30 @@ When a consumer group starts, Kafka normally waits a few seconds before assignin
 CLUSTER_ID: ${CLUSTER_ID}
 Unique identifier for this Kafka cluster. KRaft requires this. Generated once, never changes — changing it on an existing cluster wipes all data.
 
+
+## Environment Variables — how we solved it
+
+### Problem
+spring-dotenv 3.0.0 and 4.0.0 both failed to resolve
+${POSTGRES_USER} in application.yml on Spring Boot 3.5
+
+### Solution
+IntelliJ EnvFile plugin:
+- Install plugin: Settings → Plugins → search "EnvFile"
+- Run Configuration → Enable EnvFile → point to .env file
+- Plugin injects all .env variables as JVM env vars at startup
+- Spring Boot resolves ${VAR} normally from those env vars
+
+Working Directory must be set to project root in run config.
+
+### Why working directory matters
+Spring Boot reads .env relative to the working directory.
+If working directory is wrong, .env is never found even if
+the file exists.
+
+### Production equivalent
+In prod, env vars are injected by the platform:
+- AWS ECS → Secrets Manager → Task Definition env vars
+- Kubernetes → kubectl create secret → pod env vars
+- GitHub Actions → Repository Secrets → pipeline env vars
+  Code never changes — only where the values come from changes.
