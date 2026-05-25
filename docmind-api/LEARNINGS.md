@@ -54,3 +54,12 @@ In prod, env vars are injected by the platform:
 - Kubernetes → kubectl create secret → pod env vars
 - GitHub Actions → Repository Secrets → pipeline env vars
   Code never changes — only where the values come from changes.
+
+### Why UUID not IDENTITY
+
+So the real reasons are:
+
+UUID — ID generated in application memory, no DB round trip needed
+UUID — ID known before save, safe to use in Kafka events immediately
+UUID — no central sequence bottleneck under high concurrent load
+UUID — harder to enumerate/guess (/documents/1, /documents/2 is a security risk)
