@@ -29,7 +29,7 @@ public class DocumentService {
                 .user(user)
                 .build();
 
-        Document saved = documentRepository.save(document);
+        Document saved = documentRepository.saveAndFlush(document);
 
         return DocumentResponse.builder()
                 .id(saved.getId())
