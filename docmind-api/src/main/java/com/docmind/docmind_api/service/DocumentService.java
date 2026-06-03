@@ -11,6 +11,7 @@ import com.docmind.docmind_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,13 +24,18 @@ import java.util.stream.Collectors;
 public class DocumentService {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final PdfExtractorService pdfExtractorService;
 
-    public DocumentResponse uploadDocument(DocumentUploadRequest request) {
-        User user = userRepository.findById(request.getUserId()).orElseThrow(()->
-                new ResourceNotFoundException("User Not Found with id: "+ request.getUserId()));
+    public DocumentResponse uploadDocument(MultipartFile file, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->
+                new ResourceNotFoundException("User Not Found with id: "+ userId));
 
-        Document document = Document.builder().fileName(request.getFileName())
-                .fileSize(request.getFileSize())
+        String extractedText = pdfExtractorService.extractText(file);
+
+
+        Document document = Document.builder().fileName(file.getOriginalFilename())
+                .fileSize(file.getSize())
+                .extractedText(extractedText)
                 .status(DocumentStatus.UPLOADED)
                 .user(user)
                 .build();
@@ -40,6 +46,7 @@ public class DocumentService {
                 .id(saved.getId())
                 .fileName(saved.getFileName())
                 .fileSize(saved.getFileSize())
+                .extractedText(saved.getExtractedText())
                 .status(saved.getStatus())
                 .uploadedAt(saved.getUploadedAt())
                 .userId(saved.getUser().getId())
@@ -56,6 +63,7 @@ public class DocumentService {
                 .id(document.getId())
                 .fileName(document.getFileName())
                 .fileSize(document.getFileSize())
+                .extractedText(document.getExtractedText())
                 .status(document.getStatus())
                 .uploadedAt(document.getUploadedAt())
                 .userId(document.getUser().getId())
@@ -72,6 +80,7 @@ public class DocumentService {
                         .id(doc.getId())
                         .fileName(doc.getFileName())
                         .fileSize(doc.getFileSize())
+                        .extractedText(doc.getExtractedText())
                         .status(doc.getStatus())
                         .uploadedAt(doc.getUploadedAt())
                         .userId(doc.getUser().getId()).build()).toList();

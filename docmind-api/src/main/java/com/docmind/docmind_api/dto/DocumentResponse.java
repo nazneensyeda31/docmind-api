@@ -20,6 +20,7 @@ public class DocumentResponse {
     private UUID id;
     private String fileName;
     private Long fileSize;
+    private String extractedText;
     private DocumentStatus status;
     private LocalDateTime uploadedAt;
     private UUID userId;

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,9 +20,10 @@ import java.util.UUID;
 
 public class DocumentController {
     private final DocumentService documentService;
-    @PostMapping("/documents")
-    public ResponseEntity<DocumentResponse> documentResponseEntity(@Valid @RequestBody DocumentUploadRequest request){
-        DocumentResponse response = documentService.uploadDocument(request);
+    @PostMapping(value = "/documents", consumes = "multipart/form-data")
+    public ResponseEntity<DocumentResponse> documentResponseEntity(@RequestParam MultipartFile file,
+                                                                   @RequestParam UUID userId){
+        DocumentResponse response = documentService.uploadDocument(file, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

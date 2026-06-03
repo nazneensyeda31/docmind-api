@@ -63,3 +63,7 @@ UUID — ID generated in application memory, no DB round trip needed
 UUID — ID known before save, safe to use in Kafka events immediately
 UUID — no central sequence bottleneck under high concurrent load
 UUID — harder to enumerate/guess (/documents/1, /documents/2 is a security risk)
+
+
+@RequestBody deserializes a single JSON body. File uploads use multipart/form-data which splits the request into multiple parts — you access each part with 
+@RequestParam. They're different HTTP content types and Spring handles them differently.
