@@ -29,6 +29,8 @@ public class Document {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime uploadedAt;
+    @Column(columnDefinition = "TEXT")
+    private String extractedText;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
