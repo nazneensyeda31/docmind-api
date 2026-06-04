@@ -6,6 +6,8 @@ import com.docmind.docmind_api.domain.entity.User;
 import com.docmind.docmind_api.dto.DocumentResponse;
 import com.docmind.docmind_api.dto.DocumentUploadRequest;
 import com.docmind.docmind_api.exception.ResourceNotFoundException;
+import com.docmind.docmind_api.kafka.DocumentEventProducer;
+import com.docmind.docmind_api.kafka.event.DocumentUploadedEvent;
 import com.docmind.docmind_api.repository.DocumentRepository;
 import com.docmind.docmind_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,12 +26,14 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final PdfExtractorService pdfExtractorService;
+    private final DocumentEventProducer eventProducer;
 
     public DocumentResponse uploadDocument(MultipartFile file, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(()->
                 new ResourceNotFoundException("User Not Found with id: "+ userId));
 
         String extractedText = pdfExtractorService.extractText(file);
+
 
 
         Document document = Document.builder().fileName(file.getOriginalFilename())
@@ -41,6 +44,18 @@ public class DocumentService {
                 .build();
 
         Document saved = documentRepository.saveAndFlush(document);
+        DocumentUploadedEvent event = DocumentUploadedEvent.builder()
+                .documentId(saved.getId())
+                .userId(saved.getUser().getId())
+                .fileName(saved.getFileName())
+                .extractedText(saved.getExtractedText())
+                .build();
+        eventProducer.publishDocumentUploadedEvent(event);
+
+
+
+
+
 
         return DocumentResponse.builder()
                 .id(saved.getId())
