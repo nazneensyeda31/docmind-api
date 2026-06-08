@@ -14,14 +14,11 @@ public class ClaudeAiService {
     @Value("${anthropic.api.key}")
     private String apiKey;
     private final RestClient restClient = RestClient.create();
-    public String summarizeDocument(String extractedText){
+    private String callClaude(String prompt){
         Map<String, Object> map = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
         innerMap.put("role", "user");
-        innerMap.put("content", "You are a document assistant. " +
-                "Based on the following document content, \n" +
-                "provide a brief summary in 3-5 sentences.\n\n" +
-                "Document content:\n"+ extractedText);
+        innerMap.put("content", prompt);
         map.put("model", "claude-sonnet-4-5");
         map.put("max_tokens", 1024);
         map.put("messages", List.of(innerMap));
@@ -38,7 +35,21 @@ public class ClaudeAiService {
         Map first = (Map) content.getFirst();
         return (String) first.get("text");
 
+    }
+    public String summarizeDocument(String extractedText){
+        return callClaude("You are a document assistant. " +
+                "Based on the following document content, \n" +
+                "provide a brief summary in 3-5 sentences.\n\n" +
+                "Document content:\n"+ extractedText);
 
+    }
 
+    public String answerQuestion(String extractedText, String question){
+        return callClaude("You are a document assistant." +
+                "Answer the following question based ONLY on the provided document content."
+                + "If the answer is not in the document,say 'I cannot find this information in the document.'\n\n" +
+                "Document content: "+ extractedText +
+
+                "Question: "+ question);
     }
 }

@@ -27,6 +27,7 @@ public class DocumentService {
     private final UserRepository userRepository;
     private final PdfExtractorService pdfExtractorService;
     private final DocumentEventProducer eventProducer;
+    private final ClaudeAiService claudeAiService;
 
     public DocumentResponse uploadDocument(MultipartFile file, UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(()->
@@ -102,5 +103,15 @@ public class DocumentService {
                         .status(doc.getStatus())
                         .uploadedAt(doc.getUploadedAt())
                         .userId(doc.getUser().getId()).build()).toList();
+    }
+
+    public String askQuestion(UUID documentId, String question){
+        Document document = documentRepository.findById(documentId).orElseThrow(()->
+                new ResourceNotFoundException("Document not found with id: "+ documentId));
+        if(document.getStatus() != DocumentStatus.PROCESSED){
+            throw new IllegalStateException("Document is not yet processed");
+        }
+            return claudeAiService.answerQuestion(document.getExtractedText(), question);
+
     }
 }

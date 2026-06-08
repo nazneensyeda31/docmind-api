@@ -2,6 +2,7 @@ package com.docmind.docmind_api.controller;
 
 import com.docmind.docmind_api.dto.DocumentResponse;
 import com.docmind.docmind_api.dto.DocumentUploadRequest;
+import com.docmind.docmind_api.dto.QuestionRequest;
 import com.docmind.docmind_api.service.DocumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,19 @@ public class DocumentController {
     }
 
     @GetMapping("/documents")
-    public ResponseEntity<List<DocumentResponse>> documentsResponseEntityByUserId(@RequestParam("userId") UUID id){
+    public ResponseEntity<List<DocumentResponse>> documentsResponseEntityByUserId(
+            @RequestParam("userId") UUID id){
         List<DocumentResponse> documentResponses = documentService.getDocumentsById(id);
         return ResponseEntity.ok().body(documentResponses);
+    }
+
+    @PostMapping("/documents/{id}/ask")
+    public ResponseEntity<String> answerResponse(@Valid @PathVariable("id") UUID id,
+                                                 @RequestBody @Valid QuestionRequest request){
+        String answer = documentService.askQuestion(id, request.getQuestion());
+
+        return ResponseEntity.ok().body(answer);
+
     }
 
 }
