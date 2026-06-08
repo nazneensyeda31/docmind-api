@@ -67,3 +67,24 @@ UUID — harder to enumerate/guess (/documents/1, /documents/2 is a security ris
 
 @RequestBody deserializes a single JSON body. File uploads use multipart/form-data which splits the request into multiple parts — you access each part with 
 @RequestParam. They're different HTTP content types and Spring handles them differently.
+
+## Kafka Consumer
+Good question — let me explain each line:
+consumer:
+  group-id: docmind-group
+Every consumer belongs to a group. Kafka uses this to track which messages have been consumed.
+ If your app restarts, it picks up from where it left off.
+  auto-offset-reset: earliest
+When your consumer starts fresh with no saved offset — 
+  should it read from the beginning of the topic or only new messages?
+  `earliest` = read everything from the start. `latest` = only new messages.
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+Producer serialized the event to JSON string. Consumer needs to deserialize it back to a Java object. 
+`JsonDeserializer` does that conversion.
+  properties:
+    spring.json.trusted.packages: "com.docmind.docmind_api.kafka.event"
+Security measure — tells Spring which packages are trusted for deserialization. 
+Without this Spring refuses to deserialize into your classes to prevent malicious payloads.
+    spring.json.value.default.type: "com.docmind.docmind_api.kafka.event.DocumentUploadedEvent"
+Tells the deserializer exactly which Java class to convert the JSON into.

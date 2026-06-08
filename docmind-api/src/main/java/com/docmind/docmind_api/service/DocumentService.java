@@ -62,6 +62,7 @@ public class DocumentService {
                 .fileName(saved.getFileName())
                 .fileSize(saved.getFileSize())
                 .extractedText(saved.getExtractedText())
+                .aiSummary(saved.getAiSummary())
                 .status(saved.getStatus())
                 .uploadedAt(saved.getUploadedAt())
                 .userId(saved.getUser().getId())
@@ -79,6 +80,7 @@ public class DocumentService {
                 .fileName(document.getFileName())
                 .fileSize(document.getFileSize())
                 .extractedText(document.getExtractedText())
+                .aiSummary(document.getAiSummary())
                 .status(document.getStatus())
                 .uploadedAt(document.getUploadedAt())
                 .userId(document.getUser().getId())
@@ -96,6 +98,7 @@ public class DocumentService {
                         .fileName(doc.getFileName())
                         .fileSize(doc.getFileSize())
                         .extractedText(doc.getExtractedText())
+                        .aiSummary(doc.getAiSummary())
                         .status(doc.getStatus())
                         .uploadedAt(doc.getUploadedAt())
                         .userId(doc.getUser().getId()).build()).toList();

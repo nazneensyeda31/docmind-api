@@ -24,4 +24,5 @@ public class DocumentResponse {
     private DocumentStatus status;
     private LocalDateTime uploadedAt;
     private UUID userId;
+    private String aiSummary;
 }

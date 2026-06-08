@@ -34,4 +34,6 @@ public class Document {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+    @Column(columnDefinition = "TEXT")
+    private String aiSummary;
 }
