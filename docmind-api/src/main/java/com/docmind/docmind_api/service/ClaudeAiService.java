@@ -1,7 +1,10 @@
 package com.docmind.docmind_api.service;
 
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -14,7 +17,10 @@ public class ClaudeAiService {
     @Value("${anthropic.api.key}")
     private String apiKey;
     private final RestClient restClient = RestClient.create();
-    private String callClaude(String prompt){
+
+    @Retry(name="claudeApi", fallbackMethod = "claudeFallback")
+    @CircuitBreaker(name = "claudeApi", fallbackMethod = "claudeFallback")
+    public String callClaude(String prompt){
         Map<String, Object> map = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
         innerMap.put("role", "user");
@@ -41,6 +47,10 @@ public class ClaudeAiService {
                 "Based on the following document content, \n" +
                 "provide a brief summary in 3-5 sentences.\n\n" +
                 "Document content:\n"+ extractedText);
+
+    }
+    private String claudeFallback(String prompt, Exception e){
+        return "AI service is temporarily unavailable. Please try again later.";
 
     }
 
