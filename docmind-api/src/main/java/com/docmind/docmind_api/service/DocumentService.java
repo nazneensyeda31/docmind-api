@@ -12,6 +12,7 @@ import com.docmind.docmind_api.repository.DocumentRepository;
 import com.docmind.docmind_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -105,6 +106,7 @@ public class DocumentService {
                         .userId(doc.getUser().getId()).build()).toList();
     }
 
+    @Cacheable(value = "questionAnswers", key = "#documentId + ':' + #question")
     public String askQuestion(UUID documentId, String question){
         Document document = documentRepository.findById(documentId).orElseThrow(()->
                 new ResourceNotFoundException("Document not found with id: "+ documentId));
