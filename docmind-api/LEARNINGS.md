@@ -88,3 +88,17 @@ Security measure — tells Spring which packages are trusted for deserialization
 Without this Spring refuses to deserialize into your classes to prevent malicious payloads.
     spring.json.value.default.type: "com.docmind.docmind_api.kafka.event.DocumentUploadedEvent"
 Tells the deserializer exactly which Java class to convert the JSON into.
+
+
+## Security
+Salt — random string added to password before hashing
+Purpose — prevents rainbow table attacks
+BCrypt — automatically generates and embeds salt in the hash
+Never store plain text passwords — always BCryptPasswordEncoder
+
+## jwt
+Header  — algorithm (HS256) + token type (JWT)
+Payload — claims: email, role, issued at, expiration
+Signature — HMAC(base64(header) + "." + base64(payload), secretKey)
+— verifies token wasn't tampered with
+— only server with secret key can verify

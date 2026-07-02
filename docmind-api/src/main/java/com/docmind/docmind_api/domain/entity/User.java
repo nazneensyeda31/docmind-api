@@ -34,4 +34,8 @@ public class User {
     private LocalDateTime createdAt;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Document> documents = new ArrayList<>();
+    @Column(nullable = false)
+    private String password;
+    @Column(nullable = false)
+    private String role;
 }
